@@ -36,3 +36,6 @@ jobs:
         with:
           name: ferme-mali-test
           path: ferme_mali/build/app/outputs/flutter-apk/app-debug.apk
+          - uses: actions/checkout@v5
+
+- uses: subosito/flutter-action@v2
