@@ -2,35 +2,37 @@ name: Construire Ferme Mali APK
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - principal
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ferme_mali
-
     steps:
-      - name: Récupérer le projet
+      - name: Télécharger le code
         uses: actions/checkout@v4
+
+      - name: Décompresser le projet Flutter
+        run: |
+          unzip -o ferme_mali_flutter_starter.zip
+          ls -la
+          ls -la ferme_mali
 
       - name: Installer Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.35.1'
           channel: stable
 
       - name: Installer les dépendances
+        working-directory: ferme_mali
         run: flutter pub get
 
-      - name: Construire l'APK
+      - name: Construire APK
+        working-directory: ferme_mali
         run: flutter build apk --debug
 
-      - name: Sauvegarder l'APK
+      - name: Sauvegarder APK
         uses: actions/upload-artifact@v4
         with:
-          name: ferme-mali-apk
+          name: ferme-mali-test
           path: ferme_mali/build/app/outputs/flutter-apk/app-debug.apk
