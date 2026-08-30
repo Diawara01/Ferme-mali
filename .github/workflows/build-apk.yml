@@ -1,9 +1,6 @@
 name: Construire Ferme Mali APK
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -12,42 +9,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Récupérer le code
+      - name: Recuperer le code
         uses: actions/checkout@v5
 
-      - name: Décompresser le projet Flutter
+      - name: Voir les fichiers
         run: |
-          ZIP=$(find . -maxdepth 1 -name "*.zip" -print -quit)
-          echo "ZIP trouvé : $ZIP"
-          unzip -q "$ZIP" -d .
+          echo "Contenu du depot :"
+          ls -la
+          echo "Recherche des fichiers ZIP :"
+          find . -maxdepth 2 -type f -name "*.zip"
+
+      - name: Decompresser le projet
+        run: |
+          ZIP=$(find . -maxdepth 2 -type f -name "*.zip" | head -1)
+          echo "ZIP trouve : $ZIP"
+          unzip -o "$ZIP"
+          echo "Recherche de pubspec.yaml :"
+          find . -name "pubspec.yaml" -print
 
       - name: Installer Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.47.1'
           channel: stable
 
-      - name: Trouver le projet Flutter
+      - name: Installer les dependances
         run: |
-          echo "Recherche de pubspec.yaml..."
-          find . -name pubspec.yaml -print
-
-      - name: Installer les dépendances
-        run: |
-          PROJECT_DIR=$(dirname "$(find . -name pubspec.yaml -print -quit)")
-          echo "Projet Flutter trouvé dans : $PROJECT_DIR"
+          PROJECT_DIR=$(dirname "$(find . -name "pubspec.yaml" -print -quit)")
+          echo "Projet Flutter : $PROJECT_DIR"
           cd "$PROJECT_DIR"
           flutter pub get
 
       - name: Construire APK
         run: |
-          PROJECT_DIR=$(dirname "$(find . -name pubspec.yaml -print -quit)")
-          echo "Construction depuis : $PROJECT_DIR"
+          PROJECT_DIR=$(dirname "$(find . -name "pubspec.yaml" -print -quit)")
+          echo "Projet Flutter : $PROJECT_DIR"
           cd "$PROJECT_DIR"
           flutter build apk --debug
 
-      - name: Sauvegarder APK
+      - name: Recuperer APK
         uses: actions/upload-artifact@v4
         with:
-          name: ferme-mali-test
+          name: ferme-mali-apk
           path: "**/build/app/outputs/flutter-apk/app-debug.apk"
