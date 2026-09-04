@@ -1,6 +1,9 @@
 name: Construire Ferme Mali APK
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -9,45 +12,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Recuperer le code
+      - name: Récupérer le code
         uses: actions/checkout@v5
-
-      - name: Voir les fichiers
-        run: |
-          echo "Contenu du depot :"
-          ls -la
-          echo "Recherche des fichiers ZIP :"
-          find . -maxdepth 2 -type f -name "*.zip"
-
-      - name: Decompresser le projet
-        run: |
-          ZIP=$(find . -maxdepth 2 -type f -name "*.zip" | head -1)
-          echo "ZIP trouve : $ZIP"
-          unzip -o "$ZIP"
-          echo "Recherche de pubspec.yaml :"
-          find . -name "pubspec.yaml" -print
 
       - name: Installer Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.47.1'
           channel: stable
 
-      - name: Installer les dependances
-        run: |
-          PROJECT_DIR=$(dirname "$(find . -name "pubspec.yaml" -print -quit)")
-          echo "Projet Flutter : $PROJECT_DIR"
-          cd "$PROJECT_DIR"
-          flutter pub get
+      - name: Installer les dépendances
+        working-directory: ferme_mali
+        run: flutter pub get
 
       - name: Construire APK
-        run: |
-          PROJECT_DIR=$(dirname "$(find . -name "pubspec.yaml" -print -quit)")
-          echo "Projet Flutter : $PROJECT_DIR"
-          cd "$PROJECT_DIR"
-          flutter build apk --debug
+        working-directory: ferme_mali
+        run: flutter build apk --debug
 
-      - name: Recuperer APK
+      - name: Récupérer APK
         uses: actions/upload-artifact@v4
         with:
-          name: ferme-mali-apk
-          path: "**/build/app/outputs/flutter-apk/app-debug.apk"
+          name: ferme-mali-test
+          path: ferme_mali/build/app/outputs/flutter-apk/app-debug.apk
+          Corriger le workflow de construction APK
