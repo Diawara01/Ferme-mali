@@ -34,4 +34,4 @@ jobs:
         with:
           name: ferme-mali-test
           path: ferme_mali/build/app/outputs/flutter-apk/app-debug.apk
-          Corriger le workflow de construction APK
+          
